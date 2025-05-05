@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from core.detector import SensitiveDataDetector
 from core.file_processor import process_file
-from core.alert_system import validate_recipient_email
+from utils.pwned_api import check_email_breach
 
 st.set_page_config(page_title="DataGuardian", layout="wide")
 st.title("🔍 DataGuardian - Monitor de Segurança de Dados")

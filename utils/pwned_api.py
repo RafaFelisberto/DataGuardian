@@ -8,8 +8,17 @@ def check_pwned_password(password):
     return suffix in response.text
 
 def check_email_breach(email):
-    response = requests.get(
-        f"https://haveibeenpwned.com/api/v3/breachedaccount/{email}",
-        headers={"User-Agent": "DataGuardian"}
-    )
-    return response.json() if response.status_code == 200 else []
+    """
+    Verifica se um e-mail foi exposto em vazamentos conhecidos via Have I Been Pwned.
+    """
+    try:
+        response = requests.get(
+            f"https://haveibeenpwned.com/api/v3/breachedaccount/{email}",
+            headers={"User-Agent": "DataGuardian"}
+        )
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except Exception as e:
+        print(f"Erro ao verificar e-mail: {e}")
+        return []
