@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from core.detector import SensitiveDataDetector
+from core.file_processor import process_file
 
 st.set_page_config(page_title="DataGuardian", layout="wide")
 st.title("🔍 DataGuardian - Monitor de Segurança de Dados")
