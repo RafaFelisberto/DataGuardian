@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from core.detector import SensitiveDataDetector
 from core.file_processor import process_file
+from core.alert_system import validate_recipient_email
 
 st.set_page_config(page_title="DataGuardian", layout="wide")
 st.title("🔍 DataGuardian - Monitor de Segurança de Dados")
@@ -42,3 +43,12 @@ if uploaded_file:
     selected_type = st.sidebar.selectbox("Tipo de Dado", ["Todos", "CPF", "E-mail", "Senha"])
     filtered = [f for f in findings if selected_type in f["Regex"] or 
                 any(selected_type in item for item in f["Presidio"])]
+    
+    
+email_to_check = st.text_input("Verifique se um e-mail foi vazado:")
+if st.button("Verificar"):
+    breaches = check_email_breach(email_to_check)
+    if breaches:
+        st.error(f"⚠️ O e-mail {email_to_check} foi encontrado em {len(breaches)} vazamentos!")
+    else:
+        st.success(f"✅ O e-mail {email_to_check} não foi encontrado em vazamentos.")

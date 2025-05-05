@@ -20,3 +20,7 @@ class AlertSystem:
         server.login(self.email_config["username"], self.email_config["password"])
         server.sendmail(self.email_config["from"], self.email_config["to"], 
                        f"Subject: {subject}\n\n{message}")
+        
+def validate_recipient_email(email):
+    if check_email_breach(email):
+        raise ValueError(f"O e-mail {email} foi encontrado em vazamentos conhecidos.")
