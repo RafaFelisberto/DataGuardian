@@ -1,51 +1,77 @@
 import pandas as pd
-import sqlparse  # Para SQL dumps
-import jsonlines  # Para arquivos .jsonl
-import logging
+import sqlparse
 import json
+import jsonlines
+import logging
+import os
+from io import StringIO
 
-# Configuração de logging
 logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.DEBUG)
 
-def process_file(file_path):
+def process_file(uploaded_file):
+    """
+    Processa arquivos carregados via Streamlit (UploadedFile).
+    """
     try:
-        if file_path.endswith('.csv'):
-            logging.debug(f"Lendo CSV: {file_path}")
-            df = pd.read_csv(file_path, on_bad_lines='skip')
-        
-        elif file_path.endswith('.json'):
-            logging.debug(f"Lendo JSON: {file_path}")
-            with open(file_path, 'r') as f:
-                data = [json.loads(line) for line in f if line.strip()]
+        # Log do tipo do arquivo
+        file_type = uploaded_file.type
+        file_name = uploaded_file.name
+        logging.info(f"Processando arquivo: {file_name} ({file_type})")
+
+        # Carrega o conteúdo do arquivo para memória
+        content = uploaded_file.read()
+        if not content:
+            logging.error("Arquivo vazio")
+            return pd.DataFrame()
+
+        # Reinicia o cursor do arquivo para leitura múltipla
+        uploaded_file.seek(0)
+
+        # Detecta tipo e processa
+        if file_type == "text/csv" or file_name.endswith(".csv"):
+            df = pd.read_csv(StringIO(content.decode("utf-8")), on_bad_lines='skip')
+
+        elif file_type == "application/json" or file_name.endswith(".json"):
+            data = [json.loads(line) for line in StringIO(content.decode("utf-8")) if line.strip()]
             df = pd.DataFrame(data)
-        
-        elif file_path.endswith('.jsonl'):
-            logging.debug(f"Lendo JSONL: {file_path}")
-            with jsonlines.open(file_path) as reader:
+
+        elif file_name.endswith(".jsonl"):
+            with jsonlines.Reader(StringIO(content.decode("utf-8"))) as reader:
                 data = list(reader)
             df = pd.DataFrame(data)
-        
-        elif file_path.endswith('.txt'):
-            logging.debug(f"Lendo TXT: {file_path}")
-            df = pd.read_csv(file_path, delimiter='\t', on_bad_lines='skip')
-        
-        elif file_path.endswith('.sql'):
-            logging.debug(f"Lendo SQL: {file_path}")
-            df = extract_sql_data(file_path)
-        
+
+        elif file_type == "text/plain" or file_name.endswith(".txt"):
+            df = pd.read_csv(StringIO(content.decode("utf-8")), delimiter='\t', on_bad_lines='skip')
+
+        elif file_name.endswith(".sql"):
+            sql_content = content.decode("utf-8")
+            df = extract_sql_data(sql_content)
+
         else:
-            raise ValueError(f"Formato de arquivo não suportado: {file_path}")
-        
-        if df.empty:
-            logging.warning("DataFrame vazio após leitura")
-            return df
-        
-        df.columns = df.columns.str.lower()
+            raise ValueError(f"Formato de arquivo não suportado: {file_name}")
+
+        # Padroniza nomes de colunas
+        if not df.empty:
+            df.columns = df.columns.str.lower()
         return df
-    
+
     except Exception as e:
-        logging.error(f"Erro ao processar {file_path}: {e}", exc_info=True)
+        logging.error(f"Erro ao processar {file_name}: {e}", exc_info=True)
+        return pd.DataFrame()
+
+def extract_sql_data(sql_content):
+    """Extrai dados de INSERTs em arquivos SQL"""
+    try:
+        statements = sqlparse.parse(sql_content)
+        data = []
+        for stmt in statements:
+            if stmt.get_type() == "INSERT":
+                values = stmt.values()
+                if values:
+                    data.append(values)
+        return pd.DataFrame(data)
+    except Exception as e:
+        logging.error(f"Erro ao processar SQL: {e}")
         return pd.DataFrame()
 
 def extract_sql_data(sql_file):
