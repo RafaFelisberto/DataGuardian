@@ -1,0 +1,5 @@
+nome,cpf,cnpj,email,senha,telefone,timestamp,observacao
+João Silva,123.456.789-09,12.345.678/0001-90,joao@email.com,A1b@3456,(11) 99999-9999,2024-04-05 14:30:00,Dados válidos
+Maria Oliveira,98765432100,12345678000190,mariamail.com,Senha1234,11 98888-8888,2024-04-05 03:45:00,Dados inválidos (email mal formatado)
+Carlos Pereira,111.111.111-11,22.222.222/0001-22,carlos@dominio.com,Senha@123,11 97777-7777,2024-04-05 23:15:00,Senha forte e dados válidos
+Dados Aleatórios,abc123xyz,Não é CNPJ,usuario@example.com,123456,sem telefone,2024-04-05 10:00:00,CPF e CNPJ inválidos
