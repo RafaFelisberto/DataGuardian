@@ -1,38 +1,44 @@
-# 🛡️ DataGuardian
+# DataGuardian — Monitor Inteligente de Vazamento de Dados Pessoais
 
-### 🔍 Detecção Inteligente de Dados Sensíveis
+Projeto desenvolvido para detectar automaticamente **dados pessoais sensíveis** (como CPF, e-mail, senhas, entre outros) em arquivos como **CSV, JSON, TXT e SQL dumps**, ajudando na identificação proativa de possíveis vazamentos.
 
-O **DataGuardian** é uma ferramenta open-source desenvolvida em Python para detectar dados sensíveis em arquivos, como CPFs, e-mails, senhas e tokens. Ele visa ajudar desenvolvedores e equipes de segurança a evitar vazamentos de dados e exposição acidental de informações confidenciais.
+## 🔍 Funcionalidades Principais
 
----
+- [x] Upload de arquivos (CSV, JSON, TXT, SQL)
+- [x] Detecção automática de dados sensíveis usando **Regex + NLP**
+- [x] Identificação de padrões suspeitos (ex: senhas em logs, chaves expostas)
+- [x] Dashboard interativo com visualização dos riscos
+- [ ] Sistema de alerta por e-mail (em desenvolvimento)
+- [ ] Criptografia automática de campos críticos (em desenvolvimento)
 
-## 📌 Índice
+## ⚙️ Tecnologias Utilizadas
 
-- [Funcionalidades](#funcionalidades)
-- [Instalação](#instalação)
-- [Como Usar](#como-usar)
-- [Exemplo de Saída](#exemplo-de-saída)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Contribuindo](#contribuindo)
-- [Licença](#licença)
+- **Python 3.9+**
+- **Streamlit** – Interface interativa
+- **Pandas** – Processamento de dados
+- **spaCy** – Análise de linguagem natural
+- **Fernet (Cryptography)** – Criptografia de dados
+- **Regex** – Detecção de padrões
 
----
+## 🧪 Exemplos de Dados Sensíveis Detectados
 
-## ✅ Funcionalidades
+O sistema consegue identificar automaticamente:
 
-- Detecção de CPFs, e-mails, senhas e tokens.
-- Análise de arquivos de texto, logs ou dumps de dados.
-- Interface de linha de comando simples e eficaz.
-- Código modular e fácil de expandir.
-- Possibilidade de salvar relatórios de detecção.
+| Tipo de Dado | Exemplo |
+|--------------|---------|
+| CPF          | 123.456.789-09 |
+| CNPJ         | 12.345.678/0001-90 |
+| E-mail       | usuario@email.com |
+| Senha        | A1b@3456 |
+| Telefone     | (11) 99999-9999 |
+| Cartão de Crédito | 5555 4444 3333 2222 |
 
----
+Padrões baseados em expressões regulares e modelos de linguagem da biblioteca spaCy [[3]].
 
-## ⚙️ Instalação
+## 📦 Como Rodar o Projeto
 
-> Requisitos: Python 3.7 ou superior
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/RafaFelisberto/DataGuardian.git
 cd DataGuardian
-pip install -r requirements.txt
