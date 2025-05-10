@@ -97,9 +97,10 @@ class AnomalyAnalyzer:
 
     def detect_anomalies(self, logs):
         """Detecta anomalias e retorna com scores explicativos"""
-        features = self.extract_features(access_logs)
-        self.model.fit(features)  # Treina o modelo com os dados atuais
-        predictions = self.model.predict(features)
+        feats = self._extract_features(access_logs)
+        feats_scaled = self.scaler.fit_transform(feats)
+        self.model.fit(feats_scaled)
+        preds = self.model.predict(feats_scaled)
         
         results = []
         for i, (pred, score) in enumerate(zip(predictions, scores)):
