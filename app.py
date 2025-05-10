@@ -41,7 +41,6 @@ if uploaded_file:
                         "Coluna": col,
                         "Valor": text,
                         "Regex": list(regex_matches.keys()),
-                        "Presidio": [f"{t}:{v}" for t, v in presidio_matches]
                     })
 
         if not findings:

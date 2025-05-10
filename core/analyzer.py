@@ -8,7 +8,7 @@ import datetime
 
 class AnomalyAnalyzer:
     def __init__(self, model_path="models/anomaly_model.pkl"):
-        self.model = IsolationForest(contamination=0.1, behaviour='new')
+        self.model = IsolationForest(contamination=0.1)
         self.scaler = StandardScaler()
         self.model_path = model_path
         self.load_model()
@@ -97,9 +97,9 @@ class AnomalyAnalyzer:
 
     def detect_anomalies(self, logs):
         """Detecta anomalias e retorna com scores explicativos"""
-        features = self.extract_features(logs)
+        features = self.extract_features(access_logs)
+        self.model.fit(features)  # Treina o modelo com os dados atuais
         predictions = self.model.predict(features)
-        scores = self.model.score_samples(features)
         
         results = []
         for i, (pred, score) in enumerate(zip(predictions, scores)):
