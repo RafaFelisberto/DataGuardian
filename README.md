@@ -1,44 +1,68 @@
-# DataGuardian — Monitor Inteligente de Vazamento de Dados Pessoais
+# DataGuardian — Intelligent Personal Data Leak Monitor
 
-Projeto desenvolvido para detectar automaticamente **dados pessoais sensíveis** (como CPF, e-mail, senhas, entre outros) em arquivos como **CSV, JSON, TXT e SQL dumps**, ajudando na identificação proativa de possíveis vazamentos.
+A project designed to automatically detect **sensitive personal data** (such as CPF, email, passwords, etc.) in files like **CSV, JSON, TXT, and SQL dumps**, helping in the proactive identification of potential data leaks.
 
-## 🔍 Funcionalidades Principais
+## 🔍 Key Features
 
-- [x] Upload de arquivos (CSV, JSON, TXT, SQL)
-- [x] Detecção automática de dados sensíveis usando **Regex + NLP**
-- [x] Identificação de padrões suspeitos (ex: senhas em logs, chaves expostas)
-- [x] Dashboard interativo com visualização dos riscos
-- [ ] Sistema de alerta por e-mail (em desenvolvimento)
-- [ ] Criptografia automática de campos críticos (em desenvolvimento)
+- [x] File upload support (CSV, JSON, TXT, SQL)
+- [x] Automatic detection of sensitive data using **Regex + NLP**
+- [x] Identification of suspicious patterns (e.g. passwords in logs, exposed keys)
+- [x] Interactive dashboard with risk visualization
+- [ ] Email alert system *(in development)*
+- [ ] Automatic encryption of critical fields *(in development)*
 
-## ⚙️ Tecnologias Utilizadas
+## ⚙️ Technologies Used
 
 - **Python 3.9+**
-- **Streamlit** – Interface interativa
-- **Pandas** – Processamento de dados
-- **spaCy** – Análise de linguagem natural
-- **Fernet (Cryptography)** – Criptografia de dados
-- **Regex** – Detecção de padrões
+- **Streamlit** – Interactive UI framework
+- **Pandas** – Data processing and analysis
+- **spaCy** – Natural Language Processing for contextual detection
+- **Fernet (Cryptography)** – Secure field encryption
+- **Regex** – Pattern-based data detection
 
-## 🧪 Exemplos de Dados Sensíveis Detectados
+## 🧪 Detected Sensitive Data Types
 
-O sistema consegue identificar automaticamente:
+The system can automatically identify the following types of sensitive information:
 
-| Tipo de Dado | Exemplo |
-|--------------|---------|
-| CPF          | 123.456.789-09 |
-| CNPJ         | 12.345.678/0001-90 |
-| E-mail       | usuario@email.com |
-| Senha        | A1b@3456 |
-| Telefone     | (11) 99999-9999 |
-| Cartão de Crédito | 5555 4444 3333 2222 |
+| Data Type         | Example                      |
+|-------------------|------------------------------|
+| CPF               | 123.456.789-09               |
+| CNPJ              | 12.345.678/0001-90           |
+| Email             | usuario@email.com            |
+| Password          | A1b@3456                     |
+| Phone Number      | (11) 99999-9999              |
+| Credit Card       | 5555 4444 3333 2222          |
 
-Padrões baseados em expressões regulares e modelos de linguagem da biblioteca spaCy [[3]].
+Detection combines regular expressions with advanced Natural Language Processing (NLP), ensuring high accuracy even on unstructured text.
 
-## 📦 Como Rodar o Projeto
+## 📦 How to Run the Project
 
-### 1. Clone o repositório
+#
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/RafaFelisberto/DataGuardian.git
+git clone https://github.com/RafaFelisberto/DataGuardian.git 
 cd DataGuardian
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+
+### 3. Run the application
+
+```bash
+streamlit run app.py
+
+## 🛡️ Security Goal
+
+DataGuardian is built to help companies and information security professionals quickly identify and mitigate issues that could lead to exposure of sensitive data, aiding compliance with regulations such as **LGPD** and **GDPR**.
+
+## 🤝 Contribution
+
+Contributions are welcome! If you'd like to improve any part of the project, add new detection patterns, or implement pending features (like automatic encryption or email alerts), feel free to open a PR or issue on GitHub.
+
+## 📄 License
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details
