@@ -41,20 +41,21 @@ Detection combines regular expressions with advanced Natural Language Processing
 
 ### 1. Clone the repository
 
-```bash
+  ```bash
 git clone https://github.com/RafaFelisberto/DataGuardian.git 
 cd DataGuardian
+  ```
 
 ### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
-
+```
 ### 3. Run the application
 
 ```bash
 streamlit run app.py
-
+```
 ## 🛡️ Security Goal
 
 DataGuardian is built to help companies and information security professionals quickly identify and mitigate issues that could lead to exposure of sensitive data, aiding compliance with regulations such as **LGPD** and **GDPR**.
