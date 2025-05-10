@@ -1,0 +1,5 @@
+name,email,phone,ssn,credit_card,address,date,ip_address,username,password,notes
+John Doe,john.doe@example.com,(555) 123-4567,123-45-6789,4532756279624589,"123 Main St, Springfield",2024-04-05,192.168.1.100,john_doe,P@ssw0rd123,"This is a sample note with personal info"
+Jane Smith,jane.smith@domain.org,555-987-6543,987-65-4321,40240071548738827,"456 Oak Ave, Riverside",2023-12-25,10.0.0.5,jane_smith,SecurePass!2023,"Sample text with some sensitive data"
+Alice Johnson,alice.j@sub.domain.co,1-800-555-0199,111-11-1111,5178246230303084,"789 Pine Rd, Apt 5B",2024-01-01,172.16.254.3,alice_j,MyP@ssw0rd,Contains sensitive details
+Bob Brown,bob.brown@example.net,555 555 0123,222-22-2222,5425233430109903,"321 Cedar Blvd, Apt 10C",2024-03-15,8.8.8.8,bob_brown,Str0ngP@ss1234,"Test entry with multiple PII"
