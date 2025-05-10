@@ -8,8 +8,7 @@ A project designed to automatically detect **sensitive personal data** (such as 
 - [x] Automatic detection of sensitive data using **Regex + NLP**
 - [x] Identification of suspicious patterns (e.g. passwords in logs, exposed keys)
 - [x] Interactive dashboard with risk visualization
-- [ ] Email alert system *(in development)*
-- [ ] Automatic encryption of critical fields *(in development)*
+- [x] Encryption of critical fields
 
 ## ⚙️ Technologies Used
 
