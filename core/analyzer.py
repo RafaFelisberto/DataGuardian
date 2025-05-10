@@ -97,17 +97,26 @@ class AnomalyAnalyzer:
 
     def detect_anomalies(self, logs):
         """Detecta anomalias e retorna com scores explicativos"""
+<<<<<<< Updated upstream
         features = self.extract_features(logs)
         predictions = self.model.predict(features)
         scores = self.model.score_samples(features)
         
+=======
+        feats = self.extract_features(logs)
+        feats_scaled = self.scaler.fit_transform(feats)  # ⚠️ Verificar uso de fit_transform em tempo de detecção
+        self.model.fit(feats_scaled)  # Treinamento ad hoc — pode não ser necessário se já carregou modelo
+        predictions = self.model.predict(feats_scaled)
+        scores = self.model.score_samples(feats_scaled)  # ✅ Adicionado para calcular os scores
+
+>>>>>>> Stashed changes
         results = []
         for i, (pred, score) in enumerate(zip(predictions, scores)):
             results.append({
                 "log": logs[i],
                 "anomaly": bool(pred == -1),
-                "score": float(-score),
-                "reason": self._explain_anomaly(features[i], score)
+                "score": float(-score),  # IsolationForest retorna valores negativos para anomalias
+                "reason": self._explain_anomaly(feats[i], score)
             })
         return results
 
