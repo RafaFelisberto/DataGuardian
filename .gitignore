@@ -1,7 +1,30 @@
+# Env / secrets
 .env
 *.env
-encryption_key.key
 *.key
+encryption_key.key
+
+# Python
 __pycache__/
-*.pyc
-models/*.pkl
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Outputs
+reports/
+*.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+venv

@@ -67,3 +67,24 @@ Contributions are welcome! If you'd like to improve any part of the project, add
 ## 📄 License
 
 This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details
+## 🚀 New: CLI + API
+
+### CLI (scan file/folder)
+```bash
+python -m cli.main scan ./samples --out reports/report.json
+```
+
+### API (FastAPI)
+```bash
+uvicorn api.main:app --reload
+```
+
+- `POST /scan/file?format=json|html`
+- `POST /scan/text`
+
+## 📄 Reports
+DataGuardian exports:
+- JSON (machine-friendly)
+- HTML (audit-friendly)
+
+Reports never include raw sensitive values (only masked previews).

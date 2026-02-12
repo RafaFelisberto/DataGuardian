@@ -22,6 +22,8 @@ except Exception:
     PRESIDIO_AVAILABLE = False
 
 
+
+
 class SensitiveDataDetector:
     def __init__(self) -> None:
         # Carrega padrões regex

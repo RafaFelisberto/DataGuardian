@@ -3,22 +3,23 @@ import pandas as pd
 import plotly.express as px
 
 from core.file_processor import process_file
-from core.detector import SensitiveDataDetector
-from core.analyzer import AnomalyAnalyzer
+from dataguardian.config import Settings
+from dataguardian.scan import scan_dataframe
+from dataguardian.reporting import to_html
 from utils.encryption import DataEncryptor
 
-# Configuração da página
 st.set_page_config(page_title="DataGuardian", layout="wide")
 st.title("🔍 DataGuardian - Monitor de Segurança de Dados")
 
-MAX_ROWS_PREVIEW = 200
-MAX_UNIQUE_PER_COLUMN = 200  # evita DoS por coluna gigante
+settings = Settings()
 
-uploaded_file = st.file_uploader("Carregue seu arquivo de dados", type=["csv", "json", "jsonl", "txt", "sql"])
+uploaded_file = st.file_uploader(
+    "Carregue seu arquivo de dados",
+    type=["csv", "json", "jsonl", "txt", "sql"],
+)
 
 if uploaded_file:
     st.write("✅ Arquivo carregado:", uploaded_file.name)
-    st.write("📁 Tipo do arquivo:", uploaded_file.type)
 
     try:
         df = process_file(uploaded_file)
@@ -28,55 +29,68 @@ if uploaded_file:
 
         show_raw = st.checkbox("Mostrar dados brutos (pode conter PII em claro)", value=False)
         with st.expander("📂 Prévia dos dados"):
-            st.dataframe(df.head(MAX_ROWS_PREVIEW) if show_raw else df.head(MAX_ROWS_PREVIEW))
+            st.dataframe(df.head(settings.max_rows_preview) if show_raw else df.head(settings.max_rows_preview))
 
-        detector = SensitiveDataDetector()
-        findings = []
+        report = scan_dataframe(df, target=uploaded_file.name, settings=settings)
 
-        # varredura limitada por segurança/performance
-        for col in df.columns:
-            series = df[col].dropna().astype(str)
-            # pega valores únicos limitados
-            values = series.head(MAX_ROWS_PREVIEW).unique().tolist()[:MAX_UNIQUE_PER_COLUMN]
+        st.subheader("🧭 Risco (resumo)")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Nível", report.summary.level)
+        c2.metric("Score", report.summary.score)
+        c3.metric("Tipos detectados", len(report.summary.counts_by_type))
 
-            for text in values:
-                regex_matches = detector.detect_regex(text)
-                presidio_matches = detector.detect_ner_presidio(text)
-                if regex_matches or presidio_matches:
-                    findings.append(
-                        {
-                            "Coluna": col,
-                            "Valor (mascarado)": detector.mask_value(text, keep_last=4),
-                            "Regex": ", ".join(sorted(regex_matches.keys())) if regex_matches else "",
-                            "Presidio": ", ".join(sorted({t for t, _ in presidio_matches})) if presidio_matches else "",
-                        }
-                    )
-
-        if not findings:
+        if not report.findings:
             st.info("✅ Nenhum dado sensível foi encontrado na amostra analisada.")
             st.stop()
 
-        findings_df = pd.DataFrame(findings)
-        st.subheader("📌 Dados Sensíveis Detectados (valores mascarados)")
+        # Flatten findings for UI
+        rows = []
+        for f in report.findings:
+            rows.append(
+                {
+                    "Local": f.location,
+                    "Valor (mascarado)": f.masked_value,
+                    "Tipos": ", ".join(sorted({m.type for m in f.matches})),
+                    "Detectores": ", ".join(sorted({m.detector for m in f.matches})),
+                }
+            )
+        findings_df = pd.DataFrame(rows)
+
+        st.subheader("📌 Achados (valores mascarados)")
         st.dataframe(findings_df)
 
-        st.subheader("📊 Distribuição de Tipos de Dados Sensíveis")
-        # conta por Regex
-        if "Regex" in findings_df.columns and not findings_df["Regex"].fillna("").eq("").all():
-            exploded = findings_df.assign(Regex=findings_df["Regex"].str.split(", ")).explode("Regex")
-            exploded = exploded[exploded["Regex"].fillna("").ne("")]
-            if not exploded.empty:
-                fig = px.histogram(exploded, x="Regex")
-                st.plotly_chart(fig, use_container_width=True)
+        st.subheader("📊 Distribuição de tipos")
+        exploded = findings_df.assign(Tipos=findings_df["Tipos"].str.split(", ")).explode("Tipos")
+        exploded = exploded[exploded["Tipos"].fillna("").ne("")]
+        if not exploded.empty:
+            fig = px.histogram(exploded, x="Tipos")
+            st.plotly_chart(fig, use_container_width=True)
 
         st.divider()
 
-        st.subheader("🔐 Criptografia")
-        st.caption("Por segurança, prefira usar a chave via variável de ambiente DATAGUARDIAN_ENCRYPTION_KEY.")
-        use_env = st.checkbox("Usar chave via variável de ambiente", value=True)
+        st.subheader("🧾 Exportar relatório")
+        col1, col2 = st.columns(2)
+        col1.download_button(
+            "⬇️ Baixar JSON",
+            data=report.to_json(),
+            file_name=f"dataguardian_{uploaded_file.name}.json",
+            mime="application/json",
+        )
+        col2.download_button(
+            "⬇️ Baixar HTML",
+            data=to_html(report),
+            file_name=f"dataguardian_{uploaded_file.name}.html",
+            mime="text/html",
+        )
+
+        st.divider()
+
+        st.subheader("🔐 Mitigação (criptografia)")
+        st.caption("Por segurança, a chave deve vir de DATAGUARDIAN_ENCRYPTION_KEY (modo padrão).")
+        allow_file_key = st.checkbox("Permitir chave em arquivo local (NÃO recomendado)", value=False)
 
         try:
-            encryptor = DataEncryptor(use_env_key=use_env)
+            encryptor = DataEncryptor(use_env_key=True, allow_file_key=allow_file_key)
         except Exception as e:
             st.error(f"Erro ao inicializar criptografia: {e}")
             st.stop()
@@ -88,21 +102,6 @@ if uploaded_file:
             encrypted_df = encryptor.encrypt_column(df, col_to_encrypt)
             st.success(f"Coluna '{col_to_encrypt}' criptografada (preview abaixo).")
             st.dataframe(encrypted_df.head(50))
-
-        st.divider()
-
-        st.subheader("🛡️ Detecção de Anomalias (MVP)")
-        st.caption("Este módulo espera logs estruturados; aqui fica como base para evoluir (ex.: auditoria de acessos).")
-
-        if st.button("Rodar exemplo de anomalias"):
-            # exemplo simples
-            logs = [
-                {"timestamp": "2026-02-12 10:00:00", "user": "alice", "ip": "1.1.1.1", "access_count": 1, "data_accessed": "x" * 100, "data_type": "EMAIL"},
-                {"timestamp": "2026-02-12 03:10:00", "user": "alice", "ip": "1.1.1.1", "access_count": 80, "data_accessed": "x" * 20000, "data_type": "CPF"},
-            ]
-            analyzer = AnomalyAnalyzer()
-            results = analyzer.detect_anomalies(logs)
-            st.dataframe(pd.DataFrame(results))
 
     except Exception as e:
         st.error(f"Erro geral: {e}")
