@@ -1,0 +1,7 @@
+.env
+*.env
+encryption_key.key
+*.key
+__pycache__/
+*.pyc
+models/*.pkl
